@@ -1,0 +1,2 @@
+[tool.lambda_packager]
+src_patterns = ["lambda_packager", "test_file_*"]
