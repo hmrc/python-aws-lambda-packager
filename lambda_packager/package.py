@@ -60,48 +60,56 @@ class LambdaAutoPackage:
             self.config.src_patterns, source_dir
         )
 
-        self.logger.info(f"copying {matching_objects} matching_objects")
+        self.logger.info(f"copying {len(matching_objects)} matching_objects")
+        self.logger.debug(f"copying {matching_objects} matching_objects")
+
+        copied_locations = []
         for object in matching_objects:
             relative_path = object.relative_to(source_dir)
             new_location = target_dir.joinpath(relative_path)
 
             if object.is_file():
-                self.logger.info(f"copying file from {object} --> {new_location}")
+                self.logger.debug(f"about to copy file from {object} --> {new_location}")
                 new_location.parent.mkdir(exist_ok=True)
 
                 if (
                     self.config.ignore_hidden_files
                     and LambdaAutoPackage._is_hidden_file(str(relative_path))
                 ):
-                    self.logger.warning(f"skipping file {relative_path}")
-                    continue
+                    self.logger.warning(f"skipping file {object.resolve()}")
+                else:
+                    copied_locations.append(str(shutil.copyfile(object, new_location)))
 
-                shutil.copyfile(object, new_location)
             elif object.is_dir():
-                self.logger.info(f"copying directory from {object} --> {new_location}")
+                self.logger.debug(f"about to copy directory from {object} --> {new_location}")
 
                 ignore_files_callback = None
                 if self.config.ignore_hidden_files:
                     ignore_files_callback = self._is_hidden_file_list
 
-                shutil.copytree(
+                copied_locations.append(str(shutil.copytree(
                     str(object),
                     str(new_location),
                     dirs_exist_ok=True,
                     ignore=ignore_files_callback,
-                )
+                )))
             else:
                 self.logger.warning(
                     f"the path '{object}' was nether a file or directory"
                 )
 
+        copied_locations_string = "\n".join(copied_locations)
+        self.logger.info(
+            f"copied the following locations: \n{copied_locations_string}"
+        )
+
     def _is_hidden_file_list(self, src, files):
         if LambdaAutoPackage._is_hidden_file(src):
-            self.logger.warning(f"skipping hidden folder {src}")
+            self.logger.warning(f"skipping hidden folder {Path(src).resolve()}")
             return files
         files_to_skip = list(filter(LambdaAutoPackage._is_hidden_file, files))
         if files_to_skip:
-            self.logger.warning(f"skipping hidden files {files_to_skip}")
+            self.logger.warning(f"skipping hidden files {list(map(lambda file: Path(file).resolve(), files_to_skip))}")
         return files_to_skip
 
     @staticmethod
