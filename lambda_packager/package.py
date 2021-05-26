@@ -1,5 +1,3 @@
-#! /usr/bin/env python3
-
 import logging
 import shutil
 import subprocess
@@ -8,6 +6,9 @@ import tempfile
 from pathlib import Path
 
 import toml
+
+from lambda_packager.config import Config
+from lambda_packager.poetry import poetry_is_used, export_poetry
 
 
 class LambdaAutoPackage:
@@ -33,14 +34,31 @@ class LambdaAutoPackage:
         self.tmp_folder = self._create_tmp_directory()
 
     def execute(self):
+
+        if self.project_directory.joinpath("requirements.txt").is_file():
+            self.logger.info("using requirements.txt file in project directory")
+            requirements_file_path = self.project_directory.joinpath("requirements.txt")
+            self._install_requirements_txt(
+                str(self.tmp_folder), requirements_file_path=requirements_file_path
+            )
+        elif poetry_is_used(self.project_directory):
+            self.logger.info("using pyproject.toml file in project directory")
+            requirements_file_path = self.tmp_folder.joinpath("requirements.txt")
+            export_poetry(
+                target_path=requirements_file_path,
+                project_directory=self.project_directory,
+            )
+            self._install_requirements_txt(
+                str(self.tmp_folder),
+                requirements_file_path=requirements_file_path,
+                no_deps=True,
+            )
+        else:
+            self.logger.warning("No dependency found, none will be packaged")
+
         self._copy_source_files(
             source_dir=self.project_directory,
             target_dir=self.tmp_folder,
-        )
-
-        requirements_file_path = self.project_directory.joinpath("requirements.txt")
-        self._install_requirements_txt(
-            str(self.tmp_folder), requirements_file_path=requirements_file_path
         )
 
         self._create_zip_file(
@@ -133,26 +151,28 @@ class LambdaAutoPackage:
         return matching_objects
 
     @staticmethod
-    def _install_requirements_txt(target, requirements_file_path: Path):
+    def _install_requirements_txt(target, requirements_file_path: Path, no_deps=False):
+        # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
         if not requirements_file_path.is_file():
             raise ValueError(
                 f"could not find requirements.txt file at '{requirements_file_path}'"
             )
 
         logging.info(f"installing pip requirements to '{target}'")
-        # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
-        return subprocess.check_output(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                "-r",
-                requirements_file_path,
-                "--target",
-                target,
-            ]
-        )
+        cmd = [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            requirements_file_path,
+            "--target",
+            target,
+        ]
+        if no_deps:
+            cmd.append("--no-deps")
+
+        return subprocess.check_output(cmd)
 
     @staticmethod
     def _create_zip_file(source_dir, target):
@@ -183,16 +203,3 @@ class LambdaAutoPackage:
 
         config_dict = LambdaAutoPackage._read_config(file)
         return Config(**config_dict)
-
-
-class Config:
-    def __init__(self, src_patterns=None, ignore_hidden_files=True):
-        if src_patterns is None:
-            src_patterns = ["*"]
-
-        self.src_patterns = src_patterns
-        self.ignore_hidden_files = ignore_hidden_files
-
-
-if __name__ == "__main__":
-    LambdaAutoPackage().execute()

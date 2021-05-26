@@ -2,32 +2,12 @@ import pytest
 
 from lambda_packager import LambdaAutoPackage
 from lambda_packager.poetry import export_poetry, PoetryNotInstalled, poetry_is_used
-
-EXAMPLE_PYPROJECT = """
-[tool.poetry]
-name = "EXAMPLE_PYPROJECT"
-version = "0.1.0"
-description = "EXAMPLE_PYPROJECT"
-authors = ["EXAMPLE_PYPROJECT"]
-
-[tool.poetry.dependencies]
-pip-install-test = "^0.5"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-"""
+from test_file_helpers import with_poetry_toml_file
 
 BROKEN_PYPROJECT = """
 [build-system]
 requires = "foo"
 """
-
-
-def with_poetry_toml_file(test_path):
-    pyproject = test_path.joinpath("pyproject.toml")
-    pyproject.write_text(EXAMPLE_PYPROJECT)
-    return pyproject
 
 
 def test_poetry_is_not_used():

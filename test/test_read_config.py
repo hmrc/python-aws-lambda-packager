@@ -17,7 +17,7 @@ def test_read_toml_file_when_missing():
     assert not test_file.exists()
 
     response = LambdaAutoPackage._get_config(test_file.absolute())
-    assert response.src_patterns == ["*"]
+    assert response.src_patterns == ["*.py"]
     assert response.ignore_hidden_files
 
 
@@ -26,5 +26,5 @@ def test_read_toml_file_when_no_config_in_file():
     assert test_file.exists()
 
     response = LambdaAutoPackage._get_config(test_file.absolute())
-    assert response.src_patterns == ["*"]
+    assert response.src_patterns == ["*.py"]
     assert response.ignore_hidden_files
