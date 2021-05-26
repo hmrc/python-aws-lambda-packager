@@ -1,12 +1,13 @@
 [tool.poetry]
 name = "lambda_packager"
-version = "0.1.0"
+version = "1.0.0"
 description = "stop writing your packaging scripts and let this build your python aws lambda zips for you"
 authors = ["cob16 <public+github@cormacbrady.info>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9.5"
 toml = "^0.10.2"
+#poetry = {version = "1.2.0a1", allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
 black = "^21.5b1"
@@ -14,6 +15,9 @@ pytest = "^6.2.4"
 
 [tool.poetry.scripts]
 lambda-packager = 'lambda_packager:run_cli'
+
+[tool.poetry.plugins."poetry.application.plugin"]
+foo-command = "poetry_demo_plugin.plugin:MyApplicationPlugin"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
