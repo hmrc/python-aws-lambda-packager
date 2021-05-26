@@ -4,11 +4,12 @@ from lambda_packager.package import LambdaAutoPackage
 
 
 def test_read_toml_file():
-    test_file = Path("test/resources/test_config.toml")
+    test_file = Path("test/resources/test_full_config.toml")
     assert test_file.exists()
 
     response = LambdaAutoPackage._get_config(test_file.absolute())
     assert response.src_patterns == ["lambda_packager", "test_file_*"]
+    assert not response.ignore_hidden_files
 
 
 def test_read_toml_file_when_missing():
@@ -17,6 +18,7 @@ def test_read_toml_file_when_missing():
 
     response = LambdaAutoPackage._get_config(test_file.absolute())
     assert response.src_patterns == ["*"]
+    assert response.ignore_hidden_files
 
 
 def test_read_toml_file_when_no_config_in_file():
@@ -25,3 +27,4 @@ def test_read_toml_file_when_no_config_in_file():
 
     response = LambdaAutoPackage._get_config(test_file.absolute())
     assert response.src_patterns == ["*"]
+    assert response.ignore_hidden_files

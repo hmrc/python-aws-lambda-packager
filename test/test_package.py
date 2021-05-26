@@ -3,7 +3,7 @@ import shutil
 import zipfile
 from pathlib import Path
 
-from lambda_packager.package import LambdaAutoPackage
+from lambda_packager.package import LambdaAutoPackage, Config
 
 TEST_PIP_FILE = """pip-install-test==0.5
 """
@@ -114,17 +114,76 @@ class TestPackageUnit(unittest.TestCase):
         file3.parent.mkdir()
         file3.write_text("test file 2")
 
-        matches = LambdaAutoPackage()._copy_source_files(
+        LambdaAutoPackage(
+            config=Config(src_patterns=["test_file_*", "a_folder_2"])
+        )._copy_source_files(
             source_dir=source_dir,
             target_dir=self._test_path,
-            pattern_list=["test_file_*", "a_folder_2"],
         )
-
-        self.assertEqual(matches, 3)
 
         self.assertTrue(self._test_path.joinpath("test_file_1").exists())
         self.assertTrue(self._test_path.joinpath("a_folder/test_file_2").exists())
         self.assertTrue(self._test_path.joinpath("a_folder_2/other_file").exists())
+
+    def test_copy_source_files_ignores_hidden_files(self):
+        source_dir = LambdaAutoPackage._create_tmp_directory()
+        file1 = source_dir.joinpath("test_file_1")
+        file1.write_text("test file 1")
+
+        file2 = source_dir.joinpath(".dotfolder/test_file_2")
+        file2.parent.mkdir()
+        file2.write_text("test file 2")
+
+        file3 = source_dir.joinpath("a_folder_2/.dotfile")
+        file3.parent.mkdir()
+        file3.write_text("test file 2")
+
+        file3 = source_dir.joinpath("a_folder_3/.dotfile-2")
+        file3.parent.mkdir()
+        file3.write_text("test file 2")
+
+        LambdaAutoPackage(
+            config=Config(
+                src_patterns=["test_file_*", "a_folder_2", ".dotfile-2", ".dotfolder"]
+            )
+        )._copy_source_files(
+            source_dir=source_dir,
+            target_dir=self._test_path,
+        )
+
+        self.assertTrue(self._test_path.joinpath("test_file_1").exists())
+
+        self.assertFalse(self._test_path.joinpath("a_folder_2/.dotfile").exists())
+        self.assertFalse(self._test_path.joinpath(".dotfolder/test_file_2").exists())
+        self.assertFalse(self._test_path.joinpath("a_folder_3/.dotfile-2").exists())
+
+    def test_copy_source_files_includes_hidden_files_when_asked(self):
+        source_dir = LambdaAutoPackage._create_tmp_directory()
+        file1 = source_dir.joinpath("test_file_1")
+        file1.write_text("test file 1")
+
+        file2 = source_dir.joinpath(".dotfolder/test_file_2")
+        file2.parent.mkdir()
+        file2.write_text("test file 2")
+
+        file3 = source_dir.joinpath("a_folder_2/.dotfile")
+        file3.parent.mkdir()
+        file3.write_text("test file 2")
+
+        file3 = source_dir.joinpath("a_folder_3/.dotfile-2")
+        file3.parent.mkdir()
+        file3.write_text("test file 2")
+
+        LambdaAutoPackage(
+            config=Config(ignore_hidden_files=False, src_patterns=["*"])
+        )._copy_source_files(
+            source_dir=source_dir,
+            target_dir=self._test_path,
+        )
+        self.assertTrue(self._test_path.joinpath("test_file_1").exists())
+        self.assertTrue(self._test_path.joinpath("a_folder_2/.dotfile").exists())
+        self.assertTrue(self._test_path.joinpath(".dotfolder/test_file_2").exists())
+        self.assertTrue(self._test_path.joinpath("a_folder_3/.dotfile-2").exists())
 
     def test_copy_source_files_follows_symlinks(self):
         source_dir = LambdaAutoPackage._create_tmp_directory()
@@ -134,13 +193,12 @@ class TestPackageUnit(unittest.TestCase):
         simlink_file = source_dir.joinpath("simlink_file")
         simlink_file.symlink_to(file)
 
-        matches = LambdaAutoPackage()._copy_source_files(
+        LambdaAutoPackage(
+            config=Config(src_patterns=["simlink_file"])
+        )._copy_source_files(
             source_dir=source_dir,
             target_dir=self._test_path,
-            pattern_list=["simlink_file"],
         )
-
-        self.assertEqual(matches, 1)
 
         self.assertTrue(self._test_path.joinpath("simlink_file").exists())
 
