@@ -12,9 +12,12 @@ toml = "^0.10.2"
 black = "^21.5b1"
 pytest = "^6.2.4"
 
+[tool.poetry.scripts]
+lambda-packager = 'lambda_packager:run_cli'
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.lambda_auto_package]
-src_patterns = ["lambda_auto_package"]
+[tool.lambda_packager]
+src_patterns = ["lambda_packager/*.py"]
