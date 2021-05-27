@@ -17,12 +17,12 @@ install:
 installpoetry:
 	@curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
-.PHONY: installpoetry-ci
-installpoetry-ci:
+.PHONY: installpoetryci
+installpoetryci:
 	pip install --upgrade poetry
 
 .PHONY: publish
-publish: installpoetry-ci install test-fast
+publish: installpoetryci install test-fast
 	@poetry publish --build --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
 
 
