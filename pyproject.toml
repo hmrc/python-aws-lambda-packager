@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "lambda_packager"
+name = "lambda-packager"
 version = "0.2.0"
 description = "stop writing your own scripts and let this package your python aws lambda zips for you"
 authors = ["cob16 <public+github@cormacbrady.info>"]
