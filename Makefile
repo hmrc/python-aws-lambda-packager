@@ -17,6 +17,11 @@ install:
 installpoetry:
 	@curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
+.PHONY: publish
+publish:
+	@poetry publish --build --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
+
+
 .PHONY: black
 black:
 	poetry run black .
