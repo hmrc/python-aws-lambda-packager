@@ -188,9 +188,21 @@ def test_copy_source_files_ignores_hidden_files():
     file3.parent.mkdir()
     file3.write_text("test file 2")
 
+    file3 = source_dir.joinpath(
+        "terraform/.terraform/modules/label-proxy-lambda/test/src"
+    )
+    file3.parent.mkdir(parents=True)
+    file3.write_text("test file 2")
+
     LambdaAutoPackage(
         config=Config(
-            src_patterns=["test_file_*", "a_folder_2", ".dotfile-2", ".dotfolder"]
+            src_patterns=[
+                "src",
+                "test_file_*",
+                "a_folder_2",
+                ".dotfile-2",
+                ".dotfolder",
+            ]
         )
     )._copy_source_files(
         source_dir=source_dir,
@@ -202,6 +214,11 @@ def test_copy_source_files_ignores_hidden_files():
     assert not test_path.joinpath("a_folder_2/.dotfile").exists()
     assert not test_path.joinpath(".dotfolder/test_file_2").exists()
     assert not test_path.joinpath("a_folder_3/.dotfile-2").exists()
+
+    assert not test_path.joinpath("terraform").is_dir()
+    assert not test_path.joinpath(
+        "terraform/.terraform/modules/label-proxy-lambda/test/a_folder_2"
+    ).exists()
 
 
 def test_copy_source_files_includes_hidden_files_when_asked():

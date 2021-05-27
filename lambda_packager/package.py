@@ -1,9 +1,10 @@
 import logging
+import pathlib
 import shutil
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
+from pathlib import Path, PosixPath
 
 import toml
 
@@ -82,65 +83,63 @@ class LambdaAutoPackage:
         self.logger.debug(f"copying {matching_objects} matching_objects")
 
         copied_locations = []
-        for object in matching_objects:
-            relative_path = object.relative_to(source_dir)
+        for src in matching_objects:
+            relative_path = src.relative_to(source_dir)
             new_location = target_dir.joinpath(relative_path)
 
-            if object.is_file():
-                self.logger.debug(
-                    f"about to copy file from {object} --> {new_location}"
-                )
-                new_location.parent.mkdir(exist_ok=True)
-
-                if (
-                    self.config.ignore_hidden_files
-                    and LambdaAutoPackage._is_hidden_file(str(relative_path))
-                ):
-                    self.logger.warning(f"skipping file {object.resolve()}")
-                else:
-                    copied_locations.append(str(shutil.copyfile(object, new_location)))
-
-            elif object.is_dir():
-                self.logger.debug(
-                    f"about to copy directory from {object} --> {new_location}"
-                )
-
-                ignore_files_callback = None
-                if self.config.ignore_hidden_files:
-                    ignore_files_callback = self._is_hidden_file_list
-
-                copied_locations.append(
-                    str(
-                        shutil.copytree(
-                            str(object),
-                            str(new_location),
-                            dirs_exist_ok=True,
-                            ignore=ignore_files_callback,
-                        )
-                    )
-                )
+            if self.config.ignore_hidden_files and self._is_hidden_file(src.resolve()):
+                self.logger.warning(f"skipping path {src.resolve()}")
+            elif src.is_file():
+                self.copy_file(src, new_location, copied_locations)
+            elif src.is_dir():
+                self.copy_directory(src, new_location, copied_locations)
             else:
-                self.logger.warning(
-                    f"the path '{object}' was nether a file or directory"
-                )
+                self.logger.warning(f"the path '{src}' was nether a file or directory")
 
         copied_locations_string = "\n".join(copied_locations)
         self.logger.info(f"copied the following locations: \n{copied_locations_string}")
 
+    def copy_file(self, src, new_location, copied_locations):
+        self.logger.debug(f"about to copy file from {src} --> {new_location}")
+        new_location.parent.mkdir(exist_ok=True, parents=True)
+        copied_locations.append(str(shutil.copyfile(src, new_location)))
+
+    def copy_directory(self, src, new_location, copied_locations):
+        self.logger.debug(f"about to copy directory from {src} --> {new_location}")
+        copied_locations.append(
+            str(
+                shutil.copytree(
+                    src=str(src),
+                    dst=str(new_location),
+                    dirs_exist_ok=True,
+                    ignore=(
+                        self._is_hidden_file_list
+                        if self.config.ignore_hidden_files
+                        else None
+                    ),
+                )
+            )
+        )
+
     def _is_hidden_file_list(self, src, files):
-        if LambdaAutoPackage._is_hidden_file(src):
+        if self._is_hidden_file(Path(src).resolve()):
             self.logger.warning(f"skipping hidden folder {Path(src).resolve()}")
             return files
-        files_to_skip = list(filter(LambdaAutoPackage._is_hidden_file, files))
+
+        files_to_skip = {}
+        for file in files:
+            path = Path(file).resolve()
+            if self._is_hidden_file(path):
+                files_to_skip[file] = path
+
         if files_to_skip:
-            self.logger.warning(
-                f"skipping hidden files {list(map(lambda file: Path(file).resolve(), files_to_skip))}"
-            )
-        return files_to_skip
+            self.logger.warning(f"skipping hidden files {files_to_skip.values()}")
+        return files_to_skip.keys()
 
     @staticmethod
-    def _is_hidden_file(name):
-        return name.startswith(".") or "/." in name
+    def _is_hidden_file(resolved_path: Path):
+        path = str(resolved_path)
+        return path.startswith(".") or "/." in path
 
     @staticmethod
     def _get_matching_files_and_folders(pattern_list, source_dir):
