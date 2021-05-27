@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lambda-packager"
-version = "0.2.1"
+version = "0.3.0"
 description = "Stop writing your own scripts and let this package your python aws lambda zips for you"
 authors = ["cob16 <public+github@cormacbrady.info>"]
 repository = "https://github.com/hmrc/python-aws-lambda-packager"
@@ -22,5 +22,5 @@ lambda-packager = 'lambda_packager:run_cli'
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.lambda_packager]
+[tool.lambda-packager]
 src_patterns = ["lambda_packager/*.py"]

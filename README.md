@@ -14,7 +14,7 @@ $ lambda-packager path/to/project/dir
 - By default lambda-packager will include all src files that match `*.py`
 - You can customise this with the following config:
 ```toml
-[tool.lambda_packager]
+[tool.lambda-packager]
 src_patterns = ["lambda_packager/*.py"]
 ```
 
@@ -22,7 +22,7 @@ src_patterns = ["lambda_packager/*.py"]
 - hidden files and folders are ignored by default when including src files
 - if you wish to disable this then add the following config to you pyproject.toml
 ```toml
-[tool.lambda_packager]
+[tool.lambda-packager]
 ignore_hidden_files = false
 ```
 

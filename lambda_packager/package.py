@@ -163,7 +163,7 @@ class LambdaAutoPackage:
         config = toml.loads(file.read_text())
 
         try:
-            return config["tool"]["lambda_packager"]
+            return config["tool"]["lambda-packager"]
         except KeyError:
             logging.warning("no config found!")
             return {}
