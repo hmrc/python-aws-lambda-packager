@@ -1,7 +1,11 @@
 import pytest
 
 from lambda_packager import LambdaAutoPackage
-from lambda_packager.poetry import export_poetry, PoetryNotInstalled, poetry_is_used
+from lambda_packager.handle_poetry import (
+    export_poetry,
+    PoetryNotInstalled,
+    poetry_is_used,
+)
 from test_file_helpers import with_poetry_toml_file
 
 BROKEN_PYPROJECT = """

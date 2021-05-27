@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from lambda_packager.config import Config
+from lambda_packager.handle_requirements_txt import install_requirements_txt
 from lambda_packager.package import LambdaAutoPackage
 import test_file_helpers
 
@@ -90,7 +91,7 @@ def test_error_when_no_requirements_text_is_installed():
         ValueError,
         match=f"could not find requirements.txt file*",
     ):
-        LambdaAutoPackage._install_requirements_txt(
+        install_requirements_txt(
             requirements_file_path=requirements,
             target=str(target),
         )
@@ -101,7 +102,7 @@ def test_requirements_txt_is_installed():
     requirements = test_file_helpers.with_requirements_file(test_path)
     target = test_path.joinpath("dist")
 
-    LambdaAutoPackage._install_requirements_txt(
+    install_requirements_txt(
         requirements_file_path=requirements,
         target=str(target),
     )

@@ -1,15 +1,13 @@
 import logging
-import pathlib
 import shutil
-import subprocess
-import sys
 import tempfile
-from pathlib import Path, PosixPath
+from pathlib import Path
 
 import toml
 
 from lambda_packager.config import Config
-from lambda_packager.poetry import poetry_is_used, export_poetry
+from lambda_packager.handle_poetry import poetry_is_used, export_poetry
+from lambda_packager.handle_requirements_txt import install_requirements_txt
 
 
 class LambdaAutoPackage:
@@ -39,7 +37,7 @@ class LambdaAutoPackage:
         if self.project_directory.joinpath("requirements.txt").is_file():
             self.logger.info("using requirements.txt file in project directory")
             requirements_file_path = self.project_directory.joinpath("requirements.txt")
-            self._install_requirements_txt(
+            install_requirements_txt(
                 str(self.tmp_folder), requirements_file_path=requirements_file_path
             )
         elif poetry_is_used(self.project_directory):
@@ -49,7 +47,7 @@ class LambdaAutoPackage:
                 target_path=requirements_file_path,
                 project_directory=self.project_directory,
             )
-            self._install_requirements_txt(
+            install_requirements_txt(
                 str(self.tmp_folder),
                 requirements_file_path=requirements_file_path,
                 no_deps=True,
@@ -148,30 +146,6 @@ class LambdaAutoPackage:
             matching_objects.update(source_dir.rglob(pattern))
 
         return matching_objects
-
-    @staticmethod
-    def _install_requirements_txt(target, requirements_file_path: Path, no_deps=False):
-        # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
-        if not requirements_file_path.is_file():
-            raise ValueError(
-                f"could not find requirements.txt file at '{requirements_file_path}'"
-            )
-
-        logging.info(f"installing pip requirements to '{target}'")
-        cmd = [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "-r",
-            requirements_file_path,
-            "--target",
-            target,
-        ]
-        if no_deps:
-            cmd.append("--no-deps")
-
-        return subprocess.check_output(cmd)
 
     @staticmethod
     def _create_zip_file(source_dir, target):
