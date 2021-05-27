@@ -22,7 +22,7 @@ installpoetry-ci:
 	pip install --upgrade poetry
 
 .PHONY: publish
-publish: installpoetry install test-fast
+publish: installpoetry-ci install test-fast
 	@poetry publish --build --username ${PYPI_USERNAME} --password ${PYPI_PASSWORD}
 
 
