@@ -28,6 +28,14 @@ src_patterns = ["lambda_packager/*.py"]
 ignore_hidden_files = false
 ```
 
+### Ignore folders
+If there are folders that you wish always exclude then you can use `ignore_folders`
+Note: `ignore_folders` is always respected even if there was a match via `src_patterns`
+```toml
+[tool.lambda-packager]
+ignore_folders = ["venv"]
+```
+
 ## License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").

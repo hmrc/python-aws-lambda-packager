@@ -252,7 +252,37 @@ def test_copy_source_files_includes_hidden_files_when_asked():
     assert test_path.joinpath("a_folder_3/.dotfile-2").exists()
 
 
-def test_copy_source_files_follows_symlinks():
+def test_copy_source_files_can_ignore_folders():
+    test_path = LambdaAutoPackage._create_tmp_directory()
+    source_dir = LambdaAutoPackage._create_tmp_directory()
+    file1 = source_dir.joinpath("test_file_1")
+    file1.write_text("test file 1")
+
+    file2 = source_dir.joinpath("ignore_folder_1/test_file_2")
+    file2.parent.mkdir(parents=True)
+    file2.write_text("test file 2")
+
+    file3 = source_dir.joinpath("allowed_folder/ignore_folder_2/test_file_3")
+    file3.parent.mkdir(parents=True)
+    file3.write_text("test file 3")
+
+    LambdaAutoPackage(
+        config=Config(
+            ignore_hidden_files=False,
+            src_patterns=["*"],
+            ignore_folders=["ignore_folder_1", "ignore_folder_2"],
+        ),
+    )._copy_source_files(
+        source_dir=source_dir,
+        target_dir=test_path,
+    )
+    assert test_path.joinpath("test_file_1").exists()
+
+    assert not test_path.joinpath("ignore_folder_1/test_file_2").exists()
+    assert not test_path.joinpath("allowed_folder/ignore_folder_2/test_file_3").exists()
+
+
+def test_copy_source_files_follows_symlinks(caplog):
     test_path = LambdaAutoPackage._create_tmp_directory()
     source_dir = LambdaAutoPackage._create_tmp_directory()
     file = source_dir.joinpath("real_file")

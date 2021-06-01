@@ -85,7 +85,7 @@ class LambdaAutoPackage:
             relative_path = src.relative_to(source_dir)
             new_location = target_dir.joinpath(relative_path)
 
-            if self.config.ignore_hidden_files and self._is_hidden_file(src.resolve()):
+            if self._is_ignored_file(src.resolve()):
                 self.logger.warning(f"skipping path {src.resolve()}")
             elif src.is_file():
                 self.copy_file(src, new_location, copied_locations)
@@ -111,33 +111,41 @@ class LambdaAutoPackage:
                     dst=str(new_location),
                     dirs_exist_ok=True,
                     ignore=(
-                        self._is_hidden_file_list
-                        if self.config.ignore_hidden_files
+                        self._is_ignored_file_list
+                        if self.config.ignore_hidden_files or self.config.ignore_folders
                         else None
                     ),
                 )
             )
         )
 
-    def _is_hidden_file_list(self, src, files):
-        if self._is_hidden_file(Path(src).resolve()):
+    def _is_ignored_file_list(self, src, files):
+        if self._is_ignored_file(Path(src).resolve()):
             self.logger.warning(f"skipping hidden folder {Path(src).resolve()}")
             return files
 
         files_to_skip = {}
         for file in files:
             path = Path(file).resolve()
-            if self._is_hidden_file(path):
+            if self._is_ignored_file(path):
                 files_to_skip[file] = path
 
         if files_to_skip:
             self.logger.warning(f"skipping hidden files {files_to_skip.values()}")
         return files_to_skip.keys()
 
-    @staticmethod
-    def _is_hidden_file(resolved_path: Path):
+    def _is_ignored_file(self, resolved_path: Path):
         path = str(resolved_path)
-        return path.startswith(".") or "/." in path
+
+        if self.config.ignore_hidden_files:
+            if path.startswith(".") or "/." in path:
+                return True
+
+        for folder in self.config.ignore_folders:
+            if f"/{folder}" in path:
+                return True
+
+        return False
 
     @staticmethod
     def _get_matching_files_and_folders(pattern_list, source_dir):
