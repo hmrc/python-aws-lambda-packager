@@ -7,7 +7,7 @@ Currently, requires python >=3.8 and later due to [required features of copytree
 ```bash
 $ lambda-packager
  # or if not in the project directory  
-$ lambda-packager path/to/project/dir
+$ lambda-packager --project-directory path/to/project/dir
 ```
 - lambda-packager will include any dependencies defined in
     - poetry (pyproject.toml)
@@ -34,6 +34,21 @@ Note: `ignore_folders` is always respected even if there was a match via `src_pa
 ```toml
 [tool.lambda-packager]
 ignore_folders = ["venv"]
+```
+
+### Full usage
+```
+usage: lambda-packager [-h] [--project-directory PROJECT_DIRECTORY] [-l {DEBUG,INFO,WARNING,ERROR}]
+
+Build code and dependencies into zip files that can be uploaded and run in AWS Lambda
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --project-directory PROJECT_DIRECTORY
+                        The path to the top level project directory. This is where source files and files that declare dependencies are expected to be held. Defaults to current directory
+  -l {DEBUG,INFO,WARNING,ERROR}, --log-level {DEBUG,INFO,WARNING,ERROR}
+                        set output verbosity, defaults to 'INFO'
+
 ```
 
 ## License

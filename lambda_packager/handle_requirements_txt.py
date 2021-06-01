@@ -25,4 +25,6 @@ def install_requirements_txt(target, requirements_file_path: Path, no_deps=False
     if no_deps:
         cmd.append("--no-deps")
 
-    return subprocess.check_output(cmd)
+    output = subprocess.check_output(cmd)
+    logging.debug(output.decode())
+    return output
