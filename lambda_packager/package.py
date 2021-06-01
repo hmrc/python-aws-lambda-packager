@@ -121,7 +121,7 @@ class LambdaAutoPackage:
 
     def _is_ignored_file_list(self, src, files):
         if self._is_ignored_file(Path(src).resolve()):
-            self.logger.warning(f"skipping hidden folder {Path(src).resolve()}")
+            self.logger.warning(f"skipping folder {Path(src).resolve()}")
             return files
 
         files_to_skip = {}
@@ -131,7 +131,7 @@ class LambdaAutoPackage:
                 files_to_skip[file] = path
 
         if files_to_skip:
-            self.logger.warning(f"skipping hidden files {files_to_skip.values()}")
+            self.logger.warning(f"skipping path {list(files_to_skip.values())}")
         return files_to_skip.keys()
 
     def _is_ignored_file(self, resolved_path: Path):
