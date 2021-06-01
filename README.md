@@ -1,5 +1,7 @@
 # lambda-packager
 
+Currently, requires python >=3.8 and later due to [required features of copytree](https://docs.python.org/3/library/shutil.html#shutil.copytree)
+
 ##Usage
 - Just run the packager with:
 ```bash
