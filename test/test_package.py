@@ -8,8 +8,24 @@ import pytest
 
 from lambda_packager.config import Config
 from lambda_packager.handle_requirements_txt import install_requirements_txt
-from lambda_packager.package import LambdaAutoPackage
+from lambda_packager.package import LambdaAutoPackage, NoSrcFilesFound
 import test_file_helpers
+
+
+def test_build_lambda_fails_when_no_src_was_found(caplog):
+    test_path = LambdaAutoPackage._create_tmp_directory()
+
+    file2 = test_path.joinpath("not_this_file")
+    file2.write_text("not_this_file")
+
+    with pytest.raises(
+        NoSrcFilesFound,
+        match=f"No src files were found. This is likely a problem. Exiting now to highlight this",
+    ):
+        LambdaAutoPackage(project_directory=test_path).execute()
+
+    actual_zip = test_path.joinpath("dist/lambda.zip")
+    assert not actual_zip.exists()
 
 
 def test_build_lambda_with_no_dependency(caplog):

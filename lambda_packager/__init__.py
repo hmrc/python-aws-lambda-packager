@@ -56,4 +56,8 @@ def run_cli():
     ch.setLevel(log_level)
     logger.addHandler(ch)
 
-    LambdaAutoPackage(logger=logger, project_directory=project_directory).execute()
+    try:
+        LambdaAutoPackage(logger=logger, project_directory=project_directory).execute()
+    except Exception as e:
+        logger.critical(e)
+        raise e

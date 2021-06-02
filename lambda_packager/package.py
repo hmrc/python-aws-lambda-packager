@@ -10,6 +10,10 @@ from lambda_packager.handle_poetry import poetry_is_used, export_poetry
 from lambda_packager.handle_requirements_txt import install_requirements_txt
 
 
+class NoSrcFilesFound(Exception):
+    pass
+
+
 class LambdaAutoPackage:
     def __init__(self, config=None, project_directory=None, logger=None):
         if project_directory:
@@ -93,6 +97,11 @@ class LambdaAutoPackage:
                 self.copy_directory(src, new_location, copied_locations)
             else:
                 self.logger.warning(f"the path '{src}' was nether a file or directory")
+
+        if len(copied_locations) <= 0:
+            raise NoSrcFilesFound(
+                "No src files were found. This is likely a problem. Exiting now to highlight this"
+            )
 
         copied_locations_string = "\n".join(copied_locations)
         self.logger.info(f"copied the following locations: \n{copied_locations_string}")
