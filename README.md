@@ -1,9 +1,15 @@
 # lambda-packager
 
+<a href="https://github.com/hmrc"><img alt="HMRC: Digital" src="https://img.shields.io/badge/HMRC-Digital-FFA500?style=flat&labelColor=000000&logo=gov.uk"></a>
+<a href="https://pypi.org/project/lambda-packager/"><img alt="PyPI" src="https://img.shields.io/pypi/v/lambda-packager"></a>
+<a href="https://pypi.org/project/lambda-packager/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/lambda-packager"></a>
+<a href="https://github.com/hmrc/python-aws-lambda-packager/blob/master/LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/github/license/hmrc/python-aws-lambda-packager"></a>
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+
 Currently, requires python >=3.8 and later due to [required features of copytree](https://docs.python.org/3/library/shutil.html#shutil.copytree)
 
 ##Usage
-- Just run the packager with:
+- You can run with the following:
 ```bash
 $ lambda-packager
  # or if not in the project directory  
@@ -14,22 +20,22 @@ $ lambda-packager --project-directory path/to/project/dir
     - requirements.txt
     - ~~Pipenv~~ (Coming soon!)
 - By default lambda-packager will include all src files that match `*.py`
-- You can customise this with the following config:
+- You can customise this through config in `pyproject.toml`:
 ```toml
 [tool.lambda-packager]
 src_patterns = ["lambda_packager/*.py"]
 ```
 
 ### Hidden files
-- hidden files and folders are ignored by default when including src files
-- if you wish to disable this then add the following config to you pyproject.toml
+- Hidden files and folders are ignored by default when including src files
+- if you wish to disable this, then add the following config to your `pyproject.toml`
 ```toml
 [tool.lambda-packager]
 ignore_hidden_files = false
 ```
 
 ### Ignore folders
-If there are folders that you wish always exclude then you can use `ignore_folders`
+If there are folders that you wish always exclude, then you can use `ignore_folders`
 Note: `ignore_folders` is always respected even if there was a match via `src_patterns`
 ```toml
 [tool.lambda-packager]
