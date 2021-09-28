@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from lambda_packager import LambdaAutoPackage
@@ -6,7 +8,7 @@ from lambda_packager.handle_poetry import (
     PoetryNotInstalled,
     poetry_is_used,
 )
-from test_file_helpers import with_poetry_toml_file
+from test_file_helpers import with_poetry_toml_file, with_config_file
 
 BROKEN_PYPROJECT = """
 [build-system]
@@ -52,14 +54,29 @@ def test_export_poetry():
 
     assert poetry_is_used(current_directory=test_path)
 
-    export_poetry(
-        target_path=str(expected_path), project_directory=str(test_path.resolve())
-    )
+    export_poetry(target_path=expected_path, project_directory=test_path.resolve())
 
     assert expected_path.exists()
     output = expected_path.read_text()
     assert "pip-install-test" in output
     assert "--hash=sha256" in output
+
+
+def test_export_poetry_without_hashes():
+    test_path = LambdaAutoPackage._create_tmp_directory()
+    test_config = Path("test/resources/test_project_config_without_hashes.toml")
+    with_config_file(test_path, test_config)
+
+    expected_path = test_path.joinpath("requirements.txt")
+
+    assert poetry_is_used(current_directory=test_path)
+
+    export_poetry(target_path=expected_path, project_directory=test_path.resolve())
+
+    assert expected_path.exists()
+    output = expected_path.read_text()
+    assert "pip-install-test" in output
+    assert "--hash=sha256" not in output
 
 
 def test_export_poetry_fails_if_no_exec_found():

@@ -1,0 +1,15 @@
+[tool.lambda-packager]
+without_hashes = true
+
+[tool.poetry]
+name = "EXAMPLE_PYPROJECT"
+version = "0.1.0"
+description = "EXAMPLE_PYPROJECT"
+authors = ["EXAMPLE_PYPROJECT"]
+
+[tool.poetry.dependencies]
+pip-install-test = "^0.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
