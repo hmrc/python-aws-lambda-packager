@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from lambda_packager import LambdaAutoPackage
@@ -8,7 +6,7 @@ from lambda_packager.handle_poetry import (
     PoetryNotInstalled,
     poetry_is_used,
 )
-from test_file_helpers import with_poetry_toml_file, with_config_file
+from test_file_helpers import with_poetry_toml_file
 
 BROKEN_PYPROJECT = """
 [build-system]
@@ -64,14 +62,17 @@ def test_export_poetry():
 
 def test_export_poetry_without_hashes():
     test_path = LambdaAutoPackage._create_tmp_directory()
-    test_config = Path("test/resources/test_project_config_without_hashes.toml")
-    with_config_file(test_path, test_config)
+    with_poetry_toml_file(test_path)
 
     expected_path = test_path.joinpath("requirements.txt")
 
     assert poetry_is_used(current_directory=test_path)
 
-    export_poetry(target_path=expected_path, project_directory=test_path.resolve())
+    export_poetry(
+        target_path=expected_path,
+        project_directory=test_path.resolve(),
+        without_hashes=True,
+    )
 
     assert expected_path.exists()
     output = expected_path.read_text()

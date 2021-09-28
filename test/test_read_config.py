@@ -10,6 +10,7 @@ def test_read_toml_file():
     response = LambdaAutoPackage._get_config(test_file.absolute())
     assert response.src_patterns == ["lambda_packager", "test_file_*"]
     assert not response.ignore_hidden_files
+    assert response.without_hashes
 
 
 def test_read_toml_file_when_missing():

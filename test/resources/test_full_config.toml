@@ -1,3 +1,4 @@
 [tool.lambda-packager]
 src_patterns = ["lambda_packager", "test_file_*"]
 ignore_hidden_files = false
+without_hashes = true
