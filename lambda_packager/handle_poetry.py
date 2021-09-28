@@ -9,9 +9,10 @@ class PoetryNotInstalled(Exception):
 
 
 def poetry_is_used(current_directory):
-    config = _get_poetry_config(current_directory)
-    if config is None:
+    pyproject = current_directory.joinpath("pyproject.toml")
+    if not pyproject.is_file():
         return False
+    config = toml.loads(pyproject.read_text())
 
     try:
         requires = config["build-system"]["requires"][0].startswith("poetry")
@@ -22,20 +23,7 @@ def poetry_is_used(current_directory):
         return False
 
 
-def export_poetry(target_path, project_directory=None, env=None):
-    if project_directory is not None:
-        config = _get_poetry_config(project_directory)
-    else:
-        config = None
-
-    export_without_hashes = False
-
-    if config is not None:
-        try:
-            export_without_hashes = config["tool"]["lambda-packager"]["without_hashes"]
-        except KeyError:
-            pass
-
+def export_poetry(target_path, project_directory=None, env=None, without_hashes=False):
     try:
         cmd = [
             "poetry",
@@ -49,7 +37,7 @@ def export_poetry(target_path, project_directory=None, env=None):
             target_path,
         ]
 
-        if export_without_hashes:
+        if without_hashes:
             cmd.append("--without-hashes")
 
         subprocess.check_output(
@@ -64,10 +52,3 @@ def export_poetry(target_path, project_directory=None, env=None):
     except subprocess.CalledProcessError as e:
         logging.error(e.stdout.decode())
         raise e
-
-
-def _get_poetry_config(current_directory):
-    pyproject = current_directory.joinpath("pyproject.toml")
-    if not pyproject.is_file():
-        return None
-    return toml.loads(pyproject.read_text())
