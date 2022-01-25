@@ -8,7 +8,7 @@
 
 Currently, requires python >=3.8 and later due to [required features of copytree](https://docs.python.org/3/library/shutil.html#shutil.copytree)
 
-##Usage
+## Usage
 - You can run with the following:
 ```bash
 $ lambda-packager
