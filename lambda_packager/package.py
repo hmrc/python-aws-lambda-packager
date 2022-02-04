@@ -50,6 +50,7 @@ class LambdaAutoPackage:
             export_poetry(
                 target_path=requirements_file_path,
                 project_directory=self.project_directory,
+                without_hashes=self.config.without_hashes,
             )
             install_requirements_txt(
                 str(self.tmp_folder),

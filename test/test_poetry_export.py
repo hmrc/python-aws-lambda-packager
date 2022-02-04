@@ -52,14 +52,32 @@ def test_export_poetry():
 
     assert poetry_is_used(current_directory=test_path)
 
-    export_poetry(
-        target_path=str(expected_path), project_directory=str(test_path.resolve())
-    )
+    export_poetry(target_path=expected_path, project_directory=test_path.resolve())
 
     assert expected_path.exists()
     output = expected_path.read_text()
     assert "pip-install-test" in output
     assert "--hash=sha256" in output
+
+
+def test_export_poetry_without_hashes():
+    test_path = LambdaAutoPackage._create_tmp_directory()
+    with_poetry_toml_file(test_path)
+
+    expected_path = test_path.joinpath("requirements.txt")
+
+    assert poetry_is_used(current_directory=test_path)
+
+    export_poetry(
+        target_path=expected_path,
+        project_directory=test_path.resolve(),
+        without_hashes=True,
+    )
+
+    assert expected_path.exists()
+    output = expected_path.read_text()
+    assert "pip-install-test" in output
+    assert "--hash=sha256" not in output
 
 
 def test_export_poetry_fails_if_no_exec_found():

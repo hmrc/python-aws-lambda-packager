@@ -44,6 +44,16 @@ Note: `ignore_folders` is always respected even if there was a match via `src_pa
 ignore_folders = ["venv"]
 ```
 
+### Ignore hashes
+Only has an effect when using poetry `pyproject.toml` files
+
+Skips exporting hashes from poetry to avoid issues when using non-pypi packages 
+by providing `--without-hashes` flag when calling `poetry export`
+See https://github.com/hmrc/python-aws-lambda-packager/issues/2 for more info (Note: version number remains pinned when this is enabled)
+```toml
+without_hashes = True
+```
+
 ### Full usage
 ```
 usage: lambda-packager [-h] [--project-directory PROJECT_DIRECTORY] [-l {DEBUG,INFO,WARNING,ERROR}]

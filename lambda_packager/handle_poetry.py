@@ -23,20 +23,25 @@ def poetry_is_used(current_directory):
         return False
 
 
-def export_poetry(target_path, project_directory=None, env=None):
+def export_poetry(target_path, project_directory=None, env=None, without_hashes=False):
     try:
+        cmd = [
+            "poetry",
+            "export",
+            "--no-interaction",
+            "--verbose",
+            "--with-credentials",
+            "--format",
+            "requirements.txt",
+            "--output",
+            target_path,
+        ]
+
+        if without_hashes:
+            cmd.append("--without-hashes")
+
         subprocess.check_output(
-            [
-                "poetry",
-                "export",
-                "--no-interaction",
-                "--verbose",
-                "--with-credentials",
-                "--format",
-                "requirements.txt",
-                "--output",
-                target_path,
-            ],
+            cmd,
             env=env,
             cwd=project_directory,
         )
