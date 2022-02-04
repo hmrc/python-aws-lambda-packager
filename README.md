@@ -6,6 +6,8 @@
 <a href="https://github.com/hmrc/python-aws-lambda-packager/blob/master/LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/github/license/hmrc/python-aws-lambda-packager"></a>
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
+The purpose of this tool is to avoid writing AWS lambda packaging scripts repeatedly. It is intended to give a consistent output regardless of how you currently define your python dependencies. The tool was built as most existing tools are built into larger frameworks that have other considerations when adopting
+
 Currently, requires python >=3.8 and later due to [required features of copytree](https://docs.python.org/3/library/shutil.html#shutil.copytree)
 
 ## Usage
