@@ -19,6 +19,7 @@ installpoetry:
 
 .PHONY: installpoetryci
 installpoetryci:
+	pip install --upgrade pip
 	pip install --upgrade poetry
 
 .PHONY: publish
