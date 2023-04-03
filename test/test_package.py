@@ -77,7 +77,7 @@ def test_build_lambda_with_requirements_txt(caplog):
 
 def test_build_lambda_with_pyproject_toml(caplog):
     test_path = LambdaAutoPackage._create_tmp_directory()
-    test_file_helpers.with_poetry_toml_file(test_path)
+    test_file_helpers.with_test_poetry_files(test_path)
 
     file1 = test_path.joinpath("test_file_1.py")
     file1.write_text("test file 1")

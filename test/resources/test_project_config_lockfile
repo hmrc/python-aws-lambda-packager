@@ -1,0 +1,18 @@
+[[package]]
+name = "pip-install-test"
+version = "0.5"
+description = "A minimal stub package to test success of pip install"
+category = "main"
+optional = false
+python-versions = "*"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "*"
+content-hash = "01a216963048ed061a758e967571c723fb6991e39e1cef65dd13a5e00820d023"
+
+[metadata.files]
+pip-install-test = [
+    {file = "pip-install-test-0.5.tar.gz", hash = "sha256:c33c46ced9865b59963e86e54901947520bdb73bf91849cddbb000742598bb67"},
+    {file = "pip_install_test-0.5-py3-none-any.whl", hash = "sha256:623887f5ce0b4695ec3c0503aa4f394253a403e2bb952417b3a778f0802dbe0b"},
+]

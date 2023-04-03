@@ -6,7 +6,7 @@ from lambda_packager.handle_poetry import (
     PoetryNotInstalled,
     poetry_is_used,
 )
-from test_file_helpers import with_poetry_toml_file
+from test_file_helpers import with_test_poetry_files
 
 BROKEN_PYPROJECT = """
 [build-system]
@@ -39,14 +39,14 @@ def test_poetry_checks_for_build_system_wrong_format():
 
 def test_poetry_is_used():
     test_path = LambdaAutoPackage._create_tmp_directory()
-    with_poetry_toml_file(test_path)
+    with_test_poetry_files(test_path)
 
     assert poetry_is_used(current_directory=test_path)
 
 
 def test_export_poetry():
     test_path = LambdaAutoPackage._create_tmp_directory()
-    with_poetry_toml_file(test_path)
+    with_test_poetry_files(test_path)
 
     expected_path = test_path.joinpath("requirements.txt")
 
@@ -62,7 +62,7 @@ def test_export_poetry():
 
 def test_export_poetry_without_hashes():
     test_path = LambdaAutoPackage._create_tmp_directory()
-    with_poetry_toml_file(test_path)
+    with_test_poetry_files(test_path)
 
     expected_path = test_path.joinpath("requirements.txt")
 
