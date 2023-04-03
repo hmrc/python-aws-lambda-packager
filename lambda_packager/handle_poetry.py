@@ -1,7 +1,7 @@
 import logging
 import subprocess
 
-import toml
+import tomli
 
 
 class PoetryNotInstalled(Exception):
@@ -12,7 +12,7 @@ def poetry_is_used(current_directory):
     pyproject = current_directory.joinpath("pyproject.toml")
     if not pyproject.is_file():
         return False
-    config = toml.loads(pyproject.read_text())
+    config = tomli.loads(pyproject.read_text())
 
     try:
         requires = config["build-system"]["requires"][0].startswith("poetry")

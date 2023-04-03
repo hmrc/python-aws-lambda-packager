@@ -1,5 +1,6 @@
 import logging
 
+
 # https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 class CustomLogFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""

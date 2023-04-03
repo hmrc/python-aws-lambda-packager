@@ -3,7 +3,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import toml
+import tomli
 
 from lambda_packager.config import Config
 from lambda_packager.handle_poetry import poetry_is_used, export_poetry
@@ -37,7 +37,6 @@ class LambdaAutoPackage:
         self.tmp_folder = self._create_tmp_directory()
 
     def execute(self):
-
         if self.project_directory.joinpath("requirements.txt").is_file():
             self.logger.info("using requirements.txt file in project directory")
             requirements_file_path = self.project_directory.joinpath("requirements.txt")
@@ -178,7 +177,7 @@ class LambdaAutoPackage:
 
     @staticmethod
     def _read_config(file: Path):
-        config = toml.loads(file.read_text())
+        config = tomli.loads(file.read_text())
 
         try:
             return config["tool"]["lambda-packager"]
