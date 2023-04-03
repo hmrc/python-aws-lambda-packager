@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lambda-packager"
-version = "1.2.1"
+version = "1.2.2"
 description = "Stop writing your own scripts and let this package your python aws lambda zips for you"
 authors = ["cob16 <public+github@cormacbrady.info>"]
 repository = "https://github.com/hmrc/python-aws-lambda-packager"
