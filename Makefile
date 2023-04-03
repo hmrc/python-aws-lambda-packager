@@ -19,7 +19,8 @@ installpoetry:
 
 .PHONY: installpoetryci
 installpoetryci:
-	pip install --upgrade --no-use-pep517 poetry
+	pip install --upgrade pip
+	pip install --upgrade poetry
 
 .PHONY: publish
 publish: installpoetryci install test-fast
